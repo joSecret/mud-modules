@@ -1,0 +1,7 @@
+name: 'MUD Core'
+type: module
+description: 'General customizations and blocks for the mud_egov theme.'
+package: MUD eGov
+core_version_requirement: ^11
+dependencies:
+  - drupal:block

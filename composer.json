@@ -1,0 +1,9 @@
+{
+    "name": "mud/mud_core",
+    "description": "MUD Core: block-uri și customizări comune pentru tema mud_egov.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/core": "^11"
+    }
+}

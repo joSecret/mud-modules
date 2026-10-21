@@ -1,0 +1,13 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/schemas/v1/metadata.schema.json'
+name: 'Footer Copyright'
+description: 'Footer copyright notice.'
+status: stable
+props:
+  type: object
+  properties:
+    year:
+      type: integer
+      title: Year
+    text:
+      type: string
+      title: Copyright text
