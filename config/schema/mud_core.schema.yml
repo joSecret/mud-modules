@@ -1,0 +1,28 @@
+block.settings.mud_core_footer_contact:
+  type: block_settings
+  label: 'Footer Contact block'
+  mapping:
+    logo_media:
+      type: integer
+      label: 'Logo media ID'
+      nullable: true
+    phone:
+      type: label
+      label: 'Phone'
+    email:
+      type: email
+      label: 'Email'
+    address:
+      type: text
+      label: 'Address'
+    menu_name:
+      type: string
+      label: 'Menu machine name'
+
+block.settings.mud_core_footer_copyright:
+  type: block_settings
+  label: 'Footer Copyright block'
+  mapping:
+    text:
+      type: label
+      label: 'Copyright text'

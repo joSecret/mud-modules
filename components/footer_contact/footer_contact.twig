@@ -1,0 +1,37 @@
+{#-
+/**
+ * @file
+ * Footer Contact component.
+ */
+-#}
+<div class="c--footer-contact">
+  {%- if logo_src -%}
+    <a href="{{ logo_url ?: '/' }}" class="c--footer-contact__logo" rel="home">
+      <img src="{{ logo_src }}" alt="{{ logo_alt ?: '' }}"{% if not logo_alt %} aria-hidden="true"{% endif %}>
+    </a>
+  {%- endif -%}
+
+  {%- if phone -%}
+    {%- include 'mud_egov:field_phone' with {
+      fieldPhone_value: phone
+    } -%}
+  {%- endif -%}
+
+  {%- if email -%}
+    {%- include 'mud_egov:field_mail' with {
+      fieldMail_value:email
+    } -%}
+  {%- endif -%}
+
+  {%- if address -%}
+    <p class="c--footer-contact__address">
+      {{- address|nl2br -}}
+    </p>
+  {%- endif -%}
+
+  {%- if menu -%}
+    <div class="c--footer-contact__menu">
+      {{- menu -}}
+    </div>
+  {%- endif -%}
+</div>

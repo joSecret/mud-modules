@@ -1,0 +1,37 @@
+.c--footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size_16, 16px);
+}
+
+.c--footer-contact__logo {
+  display: inline-flex;
+  margin-block-end: var(--size_8, 8px);
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.c--footer-contact__address {
+  margin: 0;
+  color: inherit;
+}
+
+.c--footer-contact__menu {
+  margin-block-start: var(--size_8, 8px);
+  display: flex;
+  align-items: center;
+  gap: var(--size_12, 12px);
+
+  ul {
+    display: flex;
+    align-items: center;
+    gap: var(--size_12, 12px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}

@@ -1,0 +1,30 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/modules/sdc/src/schemas/v1/metadata.schema.json'
+name: 'Footer Contact'
+description: 'Footer contact block with logo, phone, email, address and a menu slot.'
+status: stable
+props:
+  type: object
+  properties:
+    logo_src:
+      type: ['string', 'null']
+      title: 'Logo image URL'
+    logo_alt:
+      type: ['string', 'null']
+      title: 'Logo alt text'
+    logo_url:
+      type: ['string', 'null']
+      title: 'Logo link URL'
+      default: '/'
+    phone:
+      type: ['string', 'null']
+      title: 'Phone'
+    email:
+      type: ['string', 'null']
+      title: 'Email'
+    address:
+      type: ['string', 'null']
+      title: 'Address'
+slots:
+  menu:
+    title: 'Menu'
+    description: 'Rendered menu (e.g. Carieră / Angajăm).'
