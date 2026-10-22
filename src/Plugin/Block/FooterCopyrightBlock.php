@@ -39,8 +39,8 @@ class FooterCopyrightBlock extends BlockBase {
       '#type' => 'component',
       '#component' => 'mud_egov:footer-copyright',
       '#props' => [
-        'year' => (int) date('Y'),
-        'text' => $this->configuration['text'],
+        'footer_copyright_year' => (int) date('Y'),
+        'footer_copyright_text' => $this->configuration['text'],
       ],
     ];
   }

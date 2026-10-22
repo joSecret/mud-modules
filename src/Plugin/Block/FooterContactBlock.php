@@ -119,12 +119,12 @@ class FooterContactBlock extends BlockBase {
       '#type' => 'component',
       '#component' => 'mud_egov:footer-contact',
       '#props' => [
-        'logo_src' => $logo_src,
-        'logo_alt' => $logo_alt,
-        'logo_url' => '/',
-        'phone' => $this->configuration['phone'],
-        'email' => $this->configuration['email'],
-        'address' => $this->configuration['address'],
+        'footer_contact_logo_src' => $logo_src,
+        'footer_contact_logo_alt' => $logo_alt,
+        'footer_contact_logo_url' => '/',
+        'footer_contact_phone' => $this->configuration['phone'],
+        'footer_contact_email' => $this->configuration['email'],
+        'footer_contact_address' => $this->configuration['address'],
       ],
       '#slots' => $slots,
     ];
