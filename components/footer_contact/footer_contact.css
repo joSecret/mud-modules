@@ -1,12 +1,12 @@
 .c--footer-contact {
   display: flex;
   flex-direction: column;
-  gap: var(--size_16, 16px);
+  gap: var(--spacing-16);
 }
 
 .c--footer-contact__logo {
   display: inline-flex;
-  margin-block-end: var(--size_8, 8px);
+  margin-block-end: var(--spacing-8);
 
   img {
     display: block;
@@ -21,15 +21,15 @@
 }
 
 .c--footer-contact__menu {
-  margin-block-start: var(--size_8, 8px);
+  margin-block-start: var(--spacing-8);
   display: flex;
   align-items: center;
-  gap: var(--size_12, 12px);
+  gap: var(--spacing-12);
 
   ul {
     display: flex;
     align-items: center;
-    gap: var(--size_12, 12px);
+    gap: var(--spacing-12);
     margin: 0;
     padding: 0;
     list-style: none;
