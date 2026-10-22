@@ -16,7 +16,7 @@ class GovBrandingBlock extends BlockBase {
   public function build(): array {
     return [
       '#type' => 'component',
-      '#component' => 'mud_core:gov_branding',
+      '#component' => 'mud_egov:gov-branding',
       '#props' => [],
     ];
   }

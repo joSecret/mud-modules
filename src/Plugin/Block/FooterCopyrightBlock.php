@@ -37,7 +37,7 @@ class FooterCopyrightBlock extends BlockBase {
   public function build(): array {
     return [
       '#type' => 'component',
-      '#component' => 'mud_core:footer_copyright',
+      '#component' => 'mud_egov:footer-copyright',
       '#props' => [
         'year' => (int) date('Y'),
         'text' => $this->configuration['text'],

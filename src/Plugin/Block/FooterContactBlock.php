@@ -117,7 +117,7 @@ class FooterContactBlock extends BlockBase {
 
     return [
       '#type' => 'component',
-      '#component' => 'mud_core:footer_contact',
+      '#component' => 'mud_egov:footer-contact',
       '#props' => [
         'logo_src' => $logo_src,
         'logo_alt' => $logo_alt,
