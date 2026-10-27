@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Install hooks for mud_core.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Reîmprospătează cache-urile de entități și câmpuri, ca tipurile importate
+ * de rețete în același batch să fie vizibile pentru importul de conținut.
+ */
+function mud_core_install(bool $is_syncing = FALSE): void {
+  \Drupal::entityTypeManager()->clearCachedDefinitions();
+  \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+  \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
+}

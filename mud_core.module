@@ -1,0 +1,316 @@
+<?php
+
+/**
+ * @file
+ * Setări MUD eGov pentru block-uri (variantă, bare, titlu, spațiere),
+ * comune pentru toate site-urile care folosesc tema mud_egov.
+ *
+ * Preluat din age_general (AGE).
+ */
+
+use Drupal\block\Entity\Block;
+
+/**
+ * Returns available component variants per block plugin ID.
+ *
+ * Collected from all hook_mud_egov_block_variants() implementations.
+ */
+function _mud_core_block_variants(string $plugin_id): array {
+  $all = \Drupal::moduleHandler()->invokeAll('mud_egov_block_variants');
+  \Drupal::moduleHandler()->alter('mud_egov_block_variants', $all);
+  return $all[$plugin_id] ?? [];
+}
+
+/**
+ * Implements hook_mud_egov_block_variants().
+ */
+function mud_core_mud_egov_block_variants(): array {
+  $icons = base_path() . \Drupal::service('extension.list.module')->getPath('mud_core') . '/assets/icons/block-variants';
+
+  return [
+    'system_menu_block' => [
+      'c--menu--horizontal' => [
+        'label' => 'Orizontal',
+        'icon'  => $icons . '/menu-horizontal.svg',
+      ],
+      'c--menu--vertical' => [
+        'label' => 'Vertical',
+        'icon'  => $icons . '/menu-vertical.svg',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_alter() for block_form.
+ */
+function mud_core_form_block_form_alter(&$form, &$form_state, $form_id) {
+  $block = $form_state->getFormObject()->getEntity();
+  $plugin_id = $block->getPlugin()->getBaseId();
+  $form['settings']['#weight'] = 0;
+  $form['mud_egov_settings'] = [
+    '#type' => 'details',
+    '#title' => t('MUD eGov'),
+    '#open' => TRUE,
+    '#weight' => 5,
+    '#tree' => TRUE,
+  ];
+  if (isset($form['visibility'])) {
+    $form['visibility']['#weight'] = 10;
+  }
+
+  if (isset($form['region'])) {
+    $form['region']['#weight'] = 15;
+  }
+
+  $icons = base_path() . \Drupal::service('extension.list.module')->getPath('mud_core') . '/assets/icons/block-variants';
+  $global_options = [
+    '' => ['label' => t('Default'), 'icon' => $icons . '/block-default.svg'],
+    'global--dropdown' => ['label' => t('Dropdown'), 'icon' => $icons . '/block-dropdown.svg'],
+  ];
+  $variants = array_merge($global_options, _mud_core_block_variants($plugin_id));
+  $form['mud_egov_settings']['component_variant'] = [
+    '#type' => 'image_radio',
+    '#title' => t('Component variant'),
+    '#options' => $variants,
+    '#default_value' => $block->getThirdPartySetting('mud_egov', 'component_variant', ''),
+  ];
+
+  $icon_tid = $block->getThirdPartySetting('mud_egov', 'dropdown_icon');
+  if (_mud_core_icons_available()) {
+    $icon_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree('icons', 0, NULL, TRUE);
+    $icon_options = [];
+    $icon_terms_keyed = [];
+    foreach ($icon_terms as $term) {
+      if ($term->field_symbol_id->value) {
+        $icon_options[$term->id()] = $term->field_symbol_id->value;
+        $icon_terms_keyed[$term->id()] = $term;
+      }
+    }
+    $form['mud_egov_settings']['dropdown_icon'] = [
+      '#type' => 'details',
+      '#title' => t('Trigger icon'),
+      '#open' => !empty($icon_tid),
+      '#attributes' => ['class' => ['icon-select-wrapper']],
+      '#attached' => ['library' => ['icon_select/drupal.icon_select_backend']],
+      '#states' => [
+        'visible' => [
+          ':input[name="mud_egov_settings[component_variant]"]' => ['value' => 'global--dropdown'],
+        ],
+      ],
+      'icon_value' => [
+        '#type' => 'checkboxes',
+        '#options' => $icon_options,
+        '#default_value' => $icon_tid ? [$icon_tid => $icon_tid] : [],
+        '#terms' => $icon_terms_keyed,
+        '#process' => [
+          ['Drupal\icon_select\Plugin\Field\FieldWidget\IconSelectFieldWidgetDefault', 'processCheckboxes'],
+        ],
+      ],
+    ];
+  }
+
+  $form['mud_egov_settings']['bare'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Bare (no wrapper)'),
+    '#description' => t('Render only the content, without block-added divs.'),
+    '#default_value' => $block->getThirdPartySetting('mud_egov', 'bare', 0),
+  ];
+
+  $form['mud_egov_settings']['heading_level'] = [
+    '#type' => 'select',
+    '#title' => t('Heading level'),
+    '#options' => [
+      ''   => t('Default (h3)'),
+      'h2' => 'H2',
+      'h3' => 'H3',
+      'h4' => 'H4',
+      'h5' => 'H5',
+      'h6' => 'H6',
+    ],
+    '#default_value' => $block->getThirdPartySetting('mud_egov', 'heading_level', ''),
+    '#states' => [
+      'invisible' => [':input[name="mud_egov_settings[bare]"]' => ['checked' => TRUE]],
+    ],
+  ];
+
+  $form['mud_egov_settings']['padding'] = [
+    '#type' => 'select',
+    '#title' => t('Padding'),
+    '#options' => [
+      '' => t('Default (1rem)'),
+      'block--p-none' => t('None'),
+      'block--p-sm' => t('Small (0.5rem)'),
+      'block--p-lg' => t('Large (2rem)'),
+      'block--p-xl' => t('Extra Large (3rem)'),
+    ],
+    '#default_value' => $block->getThirdPartySetting('mud_egov', 'padding', ''),
+    '#states' => [
+      'invisible' => [':input[name="mud_egov_settings[bare]"]' => ['checked' => TRUE]],
+    ],
+  ];
+
+  $form['mud_egov_settings']['font_size'] = [
+    '#type' => 'select',
+    '#title' => t('Font Size'),
+    '#options' => [
+      '' => t('Default (inherit)'),
+      'block--fz-sm' => t('Small (0.875rem)'),
+      'block--fz-md' => t('Default'),
+      'block--fz-lg' => t('Large (1.125rem)'),
+      'block--fz-xl' => t('Extra Large (1.25rem)'),
+    ],
+    '#default_value' => $block->getThirdPartySetting('mud_egov', 'font_size', ''),
+    '#states' => [
+      'invisible' => [':input[name="mud_egov_settings[bare]"]' => ['checked' => TRUE]],
+    ],
+  ];
+  $form['#entity_builders'][] = 'mud_core_block_entity_builder';
+}
+
+/**
+ * Entity builder for block form — saves mud_egov third-party settings.
+ */
+function mud_core_block_entity_builder($entity_type, $block, &$form, &$form_state) {
+  $block->setThirdPartySetting('mud_egov', 'padding', $form_state->getValue(['mud_egov_settings', 'padding']));
+  $block->setThirdPartySetting('mud_egov', 'font_size', $form_state->getValue(['mud_egov_settings', 'font_size']));
+  $block->setThirdPartySetting('mud_egov', 'bare', $form_state->getValue(['mud_egov_settings', 'bare']));
+  $block->setThirdPartySetting('mud_egov', 'component_variant', $form_state->getValue(['mud_egov_settings', 'component_variant']));
+  $block->setThirdPartySetting('mud_egov', 'heading_level', $form_state->getValue(['mud_egov_settings', 'heading_level']));
+  $icon_values = $form_state->getValue(['mud_egov_settings', 'dropdown_icon', 'icon_value']) ?: [];
+  $selected = is_array($icon_values) ? array_filter($icon_values) : [];
+  $block->setThirdPartySetting('mud_egov', 'dropdown_icon', !empty($selected) ? (int) array_key_first($selected) : NULL);
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function mud_core_preprocess_block(&$variables) {
+  if (empty($variables['elements']['#id'])) {
+    return;
+  }
+
+  $block = Block::load($variables['elements']['#id']);
+  if (!$block) {
+    return;
+  }
+
+  $padding = $block->getThirdPartySetting('mud_egov', 'padding');
+  if ($padding) {
+    $variables['attributes']['class'][] = $padding;
+  }
+
+  $font_size = $block->getThirdPartySetting('mud_egov', 'font_size');
+  if ($font_size) {
+    $variables['attributes']['class'][] = $font_size;
+  }
+
+  $variant = $block->getThirdPartySetting('mud_egov', 'component_variant');
+  $variables['component_variant'] = $variant;
+
+  $heading = $block->getThirdPartySetting('mud_egov', 'heading_level');
+  $variables['heading_level'] = $heading ?: 'h3';
+
+  $variables['bare'] = (bool) $block->getThirdPartySetting('mud_egov', 'bare', FALSE);
+
+  if ($variant === 'global--dropdown') {
+    $icon_tid = $block->getThirdPartySetting('mud_egov', 'dropdown_icon');
+    $variables['dropdown_icon'] = $icon_tid && _mud_core_icons_available() ? _mud_core_load_icon_svg((int) $icon_tid) : NULL;
+    $variables['menu_items_dropdown'] = _mud_core_flatten_menu_for_dropdown($variables['elements']['content']['#items'] ?? []);
+  }
+
+  if (in_array($variant, ['c--menu--horizontal', 'c--menu--vertical'])) {
+    $variables['menu_items_raw'] = $variables['elements']['content']['#items'] ?? [];
+  }
+
+  if ($block->getRegion() === 'sidebar' && str_starts_with($variables['plugin_id'] ?? '', 'system_menu_block:')) {
+    $menu_name = $variables['derivative_plugin_id'] ?? NULL;
+    if ($menu_name) {
+      $active_trail_service = \Drupal::service('menu.active_trail');
+      $active_trail = $active_trail_service->getActiveTrailIds($menu_name);
+      $menu_tree_service = \Drupal::service('menu.link_tree');
+      $parameters = new \Drupal\Core\Menu\MenuTreeParameters();
+      $parameters->setActiveTrail($active_trail)->setMaxDepth(1)->onlyEnabledLinks();
+      $tree = $menu_tree_service->load($menu_name, $parameters);
+      $tree = $menu_tree_service->transform($tree, [
+        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ]);
+      foreach ($tree as $element) {
+        if ($element->inActiveTrail) {
+          $variables['sidebar_parent_label'] = $element->link->getTitle();
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Transforms Drupal menu tree items into the flat array expected by menu-dropdown.
+ */
+function _mud_core_flatten_menu_for_dropdown(array $items): array {
+  $result = [];
+  foreach ($items as $item) {
+    $result[] = [
+      'label' => $item['title'],
+      'url' => $item['url']->toString(),
+      'icon' => NULL,
+      'disabled' => FALSE,
+    ];
+    if (!empty($item['below'])) {
+      $result[] = ['divider' => TRUE];
+      foreach (_mud_core_flatten_menu_for_dropdown($item['below']) as $child) {
+        $result[] = $child;
+      }
+    }
+  }
+  return $result;
+}
+
+/**
+ * Loads and returns inline SVG markup for an icon taxonomy term.
+ */
+function _mud_core_load_icon_svg(int $tid): ?\Drupal\Core\Render\Markup {
+  $cache = &drupal_static(__FUNCTION__, []);
+
+  if (array_key_exists($tid, $cache)) {
+    return $cache[$tid];
+  }
+
+  $term = \Drupal\taxonomy\Entity\Term::load($tid);
+  if (!$term || !$term->hasField('field_svg_file')) {
+    return $cache[$tid] = NULL;
+  }
+  $file = $term->get('field_svg_file')->entity;
+
+  if (!$file) {
+    return $cache[$tid] = NULL;
+  }
+
+  $real_path = \Drupal::service('file_system')->realpath($file->getFileUri());
+  $svg = $real_path ? @file_get_contents($real_path) : FALSE;
+
+  if (!$svg) {
+    return $cache[$tid] = NULL;
+  }
+
+  $svg = preg_replace('/<\?xml.*?\?>/s', '', $svg);
+  return $cache[$tid] = \Drupal\Core\Render\Markup::create(trim($svg));
+}
+
+/**
+ * Pictogramele pentru dropdown vin din icon_select și vocabularul „icons”.
+ *
+ * Ambele sunt opționale: fără ele câmpul „Trigger icon” nu apare.
+ */
+function _mud_core_icons_available(): bool {
+  $cache = &drupal_static(__FUNCTION__);
+  if ($cache === NULL) {
+    $module_handler = \Drupal::moduleHandler();
+    $cache = $module_handler->moduleExists('icon_select')
+      && $module_handler->moduleExists('taxonomy')
+      && \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary')->load('icons') !== NULL;
+  }
+  return $cache;
+}

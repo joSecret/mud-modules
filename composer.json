@@ -1,9 +1,13 @@
 {
     "name": "mud/mud_core",
-    "description": "MUD Core: block-uri și customizări comune pentru tema mud_egov.",
+    "description": "MUD Core: block-uri și setări comune pentru site-urile care folosesc tema mud_egov.",
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/joSecret/mud-modules",
     "require": {
         "drupal/core": "^11"
+    },
+    "suggest": {
+        "drupal/icon_select": "Pictograme pentru varianta Dropdown a block-urilor (cu vocabularul icons)."
     }
 }

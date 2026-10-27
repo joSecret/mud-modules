@@ -1,10 +1,11 @@
 name: 'MUD Core'
 type: module
-description: 'General customizations and blocks for the mud_egov theme.'
+description: 'Block-uri comune (branding, footer), setări MUD eGov pentru block-uri și formatorul SVG inline pentru tema mud_egov.'
 package: MUD eGov
 core_version_requirement: ^11
 dependencies:
   - drupal:block
+  - drupal:file
+  - drupal:image
   - drupal:media
   - drupal:media_library
-  - drupal:file

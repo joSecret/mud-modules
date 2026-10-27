@@ -1,0 +1,4 @@
+image-radio:
+  css:
+    component:
+      css/image-radio.css: {}
