@@ -1,6 +1,7 @@
 name: Release
 
-# Creează tag-ul vX.Y.Z și release-ul pe GitHub. Se pornește din Actions → Release → Run workflow.
+# Creează tag-ul vX.Y.Z și release-ul pe GitHub, apoi anunță site-urile să-și actualizeze
+# composer.lock. Se pornește din Actions → Release → Run workflow.
 on:
   workflow_dispatch:
     inputs:
@@ -29,3 +30,15 @@ jobs:
           if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then echo "Tag-ul v$VERSION există deja"; exit 1; fi
       - name: Tag și release
         run: gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes
+      - name: Anunță site-urile (age, mud-docs, mud-egov)
+        env:
+          SITES_TOKEN: ${{ secrets.SITES_TOKEN }}
+        run: |
+          if [ -z "$SITES_TOKEN" ]; then echo "::warning::Lipsește secretul SITES_TOKEN: site-urile nu primesc update automat."; exit 0; fi
+          for site in age mud-docs mud-egov; do
+            GH_TOKEN="$SITES_TOKEN" gh api "repos/joSecret/$site/dispatches" \
+              -f event_type=mud-release \
+              -f "client_payload[package]=mud/mud_core" \
+              -f "client_payload[version]=$VERSION"
+            echo "Anunțat: $site"
+          done
